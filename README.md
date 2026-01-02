@@ -1,6 +1,9 @@
 # Trip-Board
 
 > **Note**: This project was developed with the assistance of **Google Gemini**.
+> 
+> **Fork Info**: 이 프로젝트는 개인 학습 및 기능 개선을 위해 기존 GitLab 프로젝트를 포크하여 개발 중입니다.
+> - **Original Repository**: [원본 프로젝트](https://lab.ssafy.com/qqaz0609/passprojectfinal.git)
 
 AI 기반 여행 계획 플랫폼 - Spring Boot & Vue 3 기반 웹 애플리케이션
 
@@ -104,7 +107,7 @@ npm install
 npm run dev
 ```
 
-브라우저에서 `http://localhost:5173` (Vite 기본 포트)으로 접속하여 확인합니다.
+브라우저에서 `http://localhost:3000`으로 접속하여 확인합니다.
 
 ## API 엔드포인트 예시
 
@@ -115,4 +118,4 @@ npm run dev
 - **OpenAI**: `/api/openai/recommend`
 
 ---
-Copyright © 2024 Trip-Board Project. All Rights Reserved.
+Copyright © 2026 Trip-Board Project. All Rights Reserved.

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.PlanAccommodationMapper">
+    
+    <resultMap id="PlanAccommodationResultMap" type="com.tripboard.entity.PlanAccommodation">
+        <id property="planId" column="plan_id"/>
+        <id property="checkInDate" column="check_in_date"/>
+        <id property="accommodationOrder" column="accommodation_order"/>
+        <result property="contentId" column="content_id"/>
+        <result property="checkOutDate" column="check_out_date"/>
+        <result property="isSelected" column="is_selected"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <select id="findByPlanId" resultMap="PlanAccommodationResultMap">
+        SELECT 
+            plan_id, content_id, check_in_date, accommodation_order, check_out_date, 
+            is_selected, created_at 
+        FROM plan_accommodations 
+        WHERE plan_id = #{planId} 
+        ORDER BY check_in_date, accommodation_order
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO plan_accommodations (plan_id, content_id, check_in_date, check_out_date, 
+                                         accommodation_order, is_selected, created_at)
+        VALUES (#{planId}, #{contentId}, #{checkInDate}, #{checkOutDate}, 
+                #{accommodationOrder}, #{isSelected}, #{createdAt})
+    </insert>
+    
+    <update id="updateOrderAndDate">
+        UPDATE plan_accommodations
+        SET 
+            check_in_date = #{newCheckInDate},
+            check_out_date = DATE_ADD(#{newCheckInDate}, INTERVAL DATEDIFF(check_out_date, check_in_date) DAY),
+            accommodation_order = #{newAccommodationOrder}
+        WHERE 
+            plan_id = #{planId}
+            AND check_in_date = #{oldCheckInDate}
+            AND accommodation_order = #{oldAccommodationOrder}
+    </update>
+
+    <delete id="deleteAccommodation">
+        DELETE FROM plan_accommodations 
+        WHERE plan_id = #{planId} 
+          AND check_in_date = #{checkInDate}
+          AND accommodation_order = #{accommodationOrder}
+    </delete>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM plan_accommodations WHERE plan_id = #{planId}
+    </delete>
+    
+    </mapper>

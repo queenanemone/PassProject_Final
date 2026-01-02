@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Trip-Board - AI 여행 대시보드</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#60A5FA",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#171F2D",
+                        "card-dark": "#202938",
+                        "border-dark": "#343F51",
+                        "text-dark-primary": "#F9FAFB",
+                        "text-dark-secondary": "#9CA3AF"
+                    },
+                    fontFamily: {
+                        "pretendard": ["Pretendard", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4B5563;
+        }
+
+        select option {
+            background-color: #1a2035;
+            color: white;
+            padding: 10px;
+        }
+        header {
+            background-color: rgba(246, 247, 248, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+        html.dark header {
+            background-color: rgba(23, 31, 45, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-dark-primary font-pretendard h-screen overflow-hidden flex flex-col">
+
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-gray-200/10 dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
+        <a href="index.html" class="flex items-center gap-4 text-slate-800 dark:text-white hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined text-primary text-2xl">map</span>
+            <h2 class="text-lg font-bold tracking-tight">Trip-Board</h2>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="new-plan.html"
+                class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-blue-500 hover:shadow-primary/40 transition-all">
+                <span class="material-symbols-outlined text-xl">add</span>
+                <span>새 계획</span>
+            </a>
+            <a href="mypage.html" id="mypageIcon" class="hidden size-10 rounded-full bg-cover bg-center bg-no-repeat bg-slate-300 dark:bg-card-dark dark:text-slate-300 hover:opacity-80 transition-opacity cursor-pointer items-center justify-center">
+                <span class="material-symbols-outlined">person</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+        <div class="mx-auto max-w-7xl pb-24">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-4" id="dashboardContent"></div>
+        </div>
+    </main>
+
+    <div id="aiRecommendContainer" class="fixed bottom-8 left-0 right-0 z-30 flex justify-center pointer-events-none"
+        style="display: none;">
+        <button id="fillWithAiBtn"
+            class="pointer-events-auto flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 hover:scale-105 transition-all duration-300 border border-white/10 backdrop-blur-md">
+            <span class="material-symbols-outlined animate-pulse">auto_awesome</span>
+            <span class="font-bold text-lg">AI로 전체 채우기</span>
+        </button>
+    </div>
+
+    <div id="unifiedSearchModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div
+            class="bg-[#1a2035] w-full max-w-2xl rounded-2xl border border-white/10 shadow-2xl flex flex-col max-h-[85vh]">
+
+            <div class="p-6 border-b border-white/10">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">항목 추가하기</h3>
+                    <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="flex gap-2 bg-black/20 p-1 rounded-lg">
+                    <button onclick="switchSearchTab('tour')" id="tab-tour"
+                        class="flex-1 py-2 rounded-md text-sm font-medium transition-colors bg-primary text-white">관광지</button>
+                    <button onclick="switchSearchTab('accom')" id="tab-accom"
+                        class="flex-1 py-2 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-white">숙소</button>
+                    <button onclick="switchSearchTab('train')" id="tab-train"
+                        class="flex-1 py-2 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-white">교통(기차)</button>
+                </div>
+            </div>
+
+            <div class="p-6 bg-[#151b2d]">
+                <div id="form-tour" class="flex flex-col gap-3">
+                    <div class="flex gap-2">
+                        <select id="searchAreaCode"
+                            class="w-1/3 bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none focus:border-primary">
+                            <option value="">전체 지역</option>
+                            <option value="1">서울</option>
+                            <option value="6">부산</option>
+                            <option value="2">인천</option>
+                            <option value="3">대전</option>
+                            <option value="4">대구</option>
+                            <option value="5">광주</option>
+                            <option value="32">강원</option>
+                            <option value="35">경북</option>
+                            <option value="38">전남</option>
+                            <option value="39">제주</option>
+                        </select>
+                        <input type="text" id="searchKeyword" placeholder="장소명 검색 (예: 해운대)"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-lg text-white px-4 focus:ring-2 focus:ring-primary outline-none">
+                    </div>
+                    <button onclick="executeSearch('tour')"
+                        class="w-full bg-primary py-2 rounded-lg text-white font-bold hover:bg-blue-600 transition-colors">검색</button>
+                </div>
+
+                <div id="form-train" class="hidden flex flex-col gap-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="trainDep" placeholder="출발역 (예: 서울)"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none focus:border-primary">
+                        <span class="text-white self-center">→</span>
+                        <input type="text" id="trainArr" placeholder="도착역 (예: 부산)"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none focus:border-primary">
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="trainType"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none focus:border-primary">
+                            <option value="">전체 차종</option>
+                            <option value="KTX">KTX</option>
+                            <option value="ITX">ITX</option>
+                            <option value="무궁화">무궁화</option>
+                        </select>
+                        <input type="time" id="trainTime"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none focus:border-primary">
+                    </div>
+                    <button onclick="executeSearch('train')"
+                        class="w-full bg-primary py-2 rounded-lg text-white font-bold hover:bg-blue-600 transition-colors">열차
+                        조회</button>
+                </div>
+            </div>
+
+            <div id="searchResults" class="flex-1 overflow-y-auto p-6 space-y-3 min-h-[200px]">
+                <p class="text-center text-gray-500 mt-10">검색 조건을 입력하고 검색하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="aiRecommendModal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-opacity duration-300">
+        <div
+            class="relative w-full max-w-4xl bg-[#1a2035] border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between p-6 border-b border-white/10">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span class="text-primary">📍</span> 어디로 떠날까요?
+                    </h2>
+                    <p class="text-gray-400 text-sm mt-1">현재 위치를 기반으로 AI가 추천하는 여행지입니다.</p>
+                </div>
+                <button id="closeAiModal"
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6">
+                <div id="aiRecommendResults" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+            </div>
+            <div class="p-4 border-t border-white/10 text-center bg-[#151b2d] rounded-b-2xl">
+                <p class="text-xs text-gray-500">마음에 드는 곳을 선택하면 AI가 자동으로 여행 계획을 완성해드립니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.CacheRailwayStationMapper">
+    
+    <resultMap id="CacheRailwayStationResultMap" type="com.tripboard.entity.CacheRailwayStation">
+        <id property="stationCode" column="station_code"/>
+        <result property="stationName" column="station_name"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="cityName" column="city_name"/>
+        <result property="lineName" column="line_name"/>
+        <result property="regionCode" column="region_code"/>
+        <result property="cachedAt" column="cached_at"/>
+    </resultMap>
+
+    <select id="findStationCodeByName" resultType="String">
+        SELECT station_code
+        FROM cache_railway_station
+        WHERE station_name = #{stationName}
+        LIMIT 1
+    </select>
+    
+    <select id="findByStationCode" resultMap="CacheRailwayStationResultMap">
+        SELECT *
+        FROM cache_railway_station
+        WHERE station_code = #{stationCode}
+    </select>
+    
+    <select id="findAll" resultMap="CacheRailwayStationResultMap">
+        SELECT *
+        FROM cache_railway_station
+    </select>
+
+    <insert id="insert">
+        INSERT INTO cache_railway_station (
+            station_code, station_name, city_code, city_name, line_name, region_code
+        ) VALUES (
+            #{stationCode}, #{stationName}, #{cityCode}, #{cityName}, #{lineName}, #{regionCode}
+        )
+        ON DUPLICATE KEY UPDATE
+            station_name = VALUES(station_name), city_name = VALUES(city_name),
+            region_code = VALUES(region_code), cached_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <insert id="insertAll">
+        INSERT INTO cache_railway_station (
+            station_code, station_name, city_code, city_name, line_name, region_code
+        ) VALUES 
+        <foreach collection="stations" item="item" separator=",">
+            (#{item.stationCode}, #{item.stationName}, #{item.cityCode}, #{item.cityName}, #{item.lineName}, #{item.regionCode})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            station_name = VALUES(station_name), 
+            city_name = VALUES(city_name),
+            region_code = VALUES(region_code), 
+            cached_at = CURRENT_TIMESTAMP
+    </insert>
+
+</mapper>

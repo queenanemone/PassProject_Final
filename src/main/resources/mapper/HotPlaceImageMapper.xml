@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.HotPlaceImageMapper">
+    
+    <resultMap id="HotPlaceImageResultMap" type="com.tripboard.entity.HotPlaceImage">
+        <id property="imageId" column="image_id"/>
+        <result property="hotplaceId" column="hotplace_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="imageOrder" column="image_order"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <select id="findByHotplaceId" resultMap="HotPlaceImageResultMap">
+        SELECT * FROM hotplace_images 
+        WHERE hotplace_id = #{hotplaceId} 
+        ORDER BY image_order ASC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="imageId">
+        INSERT INTO hotplace_images (hotplace_id, image_url, image_order, created_at)
+        VALUES (#{hotplaceId}, #{imageUrl}, #{imageOrder}, #{createdAt})
+    </insert>
+    
+    <delete id="deleteByHotplaceId">
+        DELETE FROM hotplace_images WHERE hotplace_id = #{hotplaceId}
+    </delete>
+    
+</mapper>
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.PlanTransportMapper">
+    
+    <resultMap id="PlanTransportResultMap" type="com.tripboard.entity.PlanTransport">
+        <id property="planId" column="plan_id"/>
+        <id property="transportOrder" column="transport_order"/> 
+        
+        <result property="transportType" column="transport_type"/>
+        <result property="departureStationCode" column="departure_station_code"/>
+        <result property="arrivalStationCode" column="arrival_station_code"/>
+        
+        <result property="departureTime" column="departure_time"/>
+        <result property="arrivalTime" column="arrival_time"/>
+        <result property="price" column="price"/>
+        <result property="reservationUrl" column="reservation_url"/>
+        <result property="isSelected" column="is_selected"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <select id="findByPlanId" resultMap="PlanTransportResultMap">
+        SELECT 
+            plan_id, transport_order, transport_type, departure_station_code, 
+            arrival_station_code, departure_time, arrival_time, price, 
+            reservation_url, is_selected, created_at
+        FROM plan_transports  
+        WHERE plan_id = #{planId} 
+        ORDER BY departure_time, transport_order
+    </select>
+
+    <select id="findMaxTransportOrderIndex" resultType="int">
+    SELECT COALESCE(MAX(transport_order), 0) FROM plan_transports WHERE plan_id = #{planId}
+</select>
+    
+    <insert id="insert">
+        INSERT INTO plan_transports 
+            (plan_id, transport_order, transport_type, departure_station_code, arrival_station_code,
+             departure_time, arrival_time, price, reservation_url, is_selected, created_at)
+        VALUES 
+            (#{planId}, #{transportOrder}, #{transportType}, #{departureStationCode}, #{arrivalStationCode},
+             #{departureTime}, #{arrivalTime}, #{price}, #{reservationUrl}, #{isSelected}, #{createdAt})
+    </insert>
+    
+    <update id="updateOrderAndDate">
+        UPDATE plan_transports
+        SET 
+            -- 💡 핵심: 기존 시간(TIME)은 유지하고 날짜(DATE)만 newDate로 변경 (MySQL DATE_FORMAT 사용)
+            departure_time = CONCAT(#{newDate}, ' ', TIME(departure_time)),
+            arrival_time = CONCAT(#{newDate}, ' ', TIME(arrival_time)),
+            transport_order = #{newOrder}
+        WHERE 
+            plan_id = #{planId}
+            AND transport_order = #{oldOrder}
+    </update>
+
+    <delete id="deleteTransport">
+        DELETE FROM plan_transports 
+        WHERE plan_id = #{planId} AND transport_order = #{transportOrder}
+    </delete>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM plan_transports WHERE plan_id = #{planId}
+    </delete>
+    
+    </mapper>

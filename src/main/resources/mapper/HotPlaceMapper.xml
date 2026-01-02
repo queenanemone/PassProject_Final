@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.HotPlaceMapper">
+    
+    <resultMap id="HotPlaceResultMap" type="com.tripboard.entity.HotPlace">
+        <id property="hotplaceId" column="hotplace_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="address" column="address"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="contentId" column="content_id"/>
+        <result property="contentTypeId" column="content_type_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="authorNickname" column="author_nickname"/>
+        <result property="authorName" column="author_name"/>
+        <result property="authorProfileImage" column="author_profile_image"/>
+    </resultMap>
+    
+    <select id="findById" resultMap="HotPlaceResultMap">
+        SELECT h.hotplace_id, h.user_id, h.title, h.description, h.address, h.latitude, h.longitude,
+               h.content_id, h.content_type_id, h.created_at, h.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM hotplaces h
+        LEFT JOIN users u ON h.user_id = u.user_id
+        WHERE h.hotplace_id = #{hotplaceId}
+    </select>
+    
+    <select id="findByUserId" resultMap="HotPlaceResultMap">
+        SELECT h.hotplace_id, h.user_id, h.title, h.description, h.address, h.latitude, h.longitude,
+               h.content_id, h.content_type_id, h.created_at, h.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM hotplaces h
+        LEFT JOIN users u ON h.user_id = u.user_id
+        WHERE h.user_id = #{userId}
+        ORDER BY h.created_at DESC
+    </select>
+    
+    <select id="findAll" resultMap="HotPlaceResultMap">
+        SELECT h.hotplace_id, h.user_id, h.title, h.description, h.address, h.latitude, h.longitude,
+               h.content_id, h.content_type_id, h.created_at, h.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM hotplaces h
+        LEFT JOIN users u ON h.user_id = u.user_id
+        ORDER BY h.created_at DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="hotplaceId">
+        INSERT INTO hotplaces (user_id, title, description, address, latitude, longitude, content_id, content_type_id, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{description}, #{address}, #{latitude}, #{longitude}, #{contentId}, #{contentTypeId}, #{createdAt}, #{updatedAt})
+    </insert>
+    
+    <update id="update">
+        UPDATE hotplaces
+        SET title = #{title},
+            description = #{description},
+            address = #{address},
+            latitude = #{latitude},
+            longitude = #{longitude},
+            content_id = #{contentId},
+            content_type_id = #{contentTypeId},
+            updated_at = #{updatedAt}
+        WHERE hotplace_id = #{hotplaceId}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM hotplaces WHERE hotplace_id = #{hotplaceId}
+    </delete>
+    
+</mapper>
+

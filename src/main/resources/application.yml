@@ -1,0 +1,98 @@
+spring:
+  profiles:
+    include: secret
+  application:
+    name: trip-board
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/travel_planner_korea?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: ssafy
+    password: ssafy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    # username과 password는 secret에서 가져오므로 삭제하거나 아래처럼 변수 처리
+    username: ${spring.mail.username}
+    password: ${spring.mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+# MyBatis 설정
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.tripboard.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 한국관광공사 API 설정
+# areaBasedList1 엔드포인트는 KorService1에 있음
+# 인증키는 Encoding된 것을 사용 (이미 %3D%3D로 인코딩되어 있음)
+tour:
+  api:
+    base-url: https://apis.data.go.kr/B551011/KorService2
+    photo-base-url: https://apis.data.go.kr/B551011/PhotoGalleryService1
+    service-key: ${tour.api.service-key} # 변수 처리
+    cache-duration: 604800
+
+korail:
+  api:
+    key: ${korail.api.key}
+    base-url: http://apis.data.go.kr/1613000/TrainInfoService
+
+# OpenAI API 설정
+openai:
+  api:
+    key: ${openai.api.key}
+    model: gpt-4o-mini
+    base-url: https://api.openai.com/v1
+
+# JWT 설정
+jwt:
+  secret: ${jwt.secret}
+  expiration: 86400000 # 24시간 (밀리초)
+
+# Google OAuth 설정
+google:
+  oauth:
+    client-id: ${google.oauth.client-id}
+
+# 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# 로깅 설정
+logging:
+  level:
+    com.tripboard: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.mybatis: DEBUG
+    org.apache.ibatis: DEBUG
+    java.sql: DEBUG
+    javax.sql: DEBUG

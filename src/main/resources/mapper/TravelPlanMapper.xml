@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.TravelPlanMapper">
+    
+    <resultMap id="TravelPlanResultMap" type="com.tripboard.entity.TravelPlan">
+        <id property="planId" column="plan_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="departureRegionCode" column="departure_region_code"/>
+        <result property="arrivalRegionCode" column="arrival_region_code"/>
+        <result property="departureDate" column="departure_date"/>
+        <result property="arrivalDate" column="arrival_date"/>
+        <result property="adultCount" column="adult_count"/>
+        <result property="childCount" column="child_count"/>
+        <result property="hasPet" column="has_pet"/>
+        <result property="templateId" column="template_id"/>
+        <result property="isPublic" column="is_public"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="findById" resultMap="TravelPlanResultMap">
+        SELECT * FROM travel_plans WHERE plan_id = #{planId}
+    </select>
+    
+    <select id="findByUserId" resultMap="TravelPlanResultMap">
+        SELECT * FROM travel_plans WHERE user_id = #{userId} ORDER BY created_at DESC
+    </select>
+    
+    <select id="findPublicPlans" resultMap="TravelPlanResultMap">
+        SELECT * FROM travel_plans WHERE is_public = true ORDER BY created_at DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="planId">
+        INSERT INTO travel_plans (user_id, title, departure_region_code, arrival_region_code,
+                                  departure_date, arrival_date, adult_count, child_count, has_pet,
+                                  template_id, is_public, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{departureRegionCode}, #{arrivalRegionCode},
+                #{departureDate}, #{arrivalDate}, #{adultCount}, #{childCount}, #{hasPet},
+                #{templateId}, #{isPublic}, #{createdAt}, #{updatedAt})
+    </insert>
+    
+    <update id="update">
+        UPDATE travel_plans
+        SET title = #{title},
+            departure_region_code = #{departureRegionCode},
+            arrival_region_code = #{arrivalRegionCode},
+            departure_date = #{departureDate},
+            arrival_date = #{arrivalDate},
+            adult_count = #{adultCount},
+            child_count = #{childCount},
+            has_pet = #{hasPet},
+            template_id = #{templateId},
+            is_public = #{isPublic},
+            updated_at = #{updatedAt}
+        WHERE plan_id = #{planId}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM travel_plans WHERE plan_id = #{planId}
+    </delete>
+    
+</mapper>
+

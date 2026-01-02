@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>국내 여행 공유 게시판 - Trip-Board</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+        .tab-button.active {
+            border-bottom-color: #60A5FA;
+            color: #60A5FA;
+        }
+        .tab-button.active.dark {
+            color: #60A5FA;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#60A5FA",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#171F2D",
+                        "card-dark": "#202938",
+                        "border-dark": "#343F51",
+                    },
+                    fontFamily: {
+                        "display": ["Pretendard", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-gray-200/10 dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
+            <a href="index.html" class="flex items-center gap-4 text-slate-800 dark:text-white">
+                <span class="material-symbols-outlined text-primary text-2xl">map</span>
+                <h2 class="text-lg font-bold tracking-tight">Trip-Board</h2>
+            </a>
+            <div class="hidden items-center gap-8 md:flex">
+                <a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="dashboard.html">내 대시보드</a>
+                <a class="text-sm font-medium text-primary dark:text-primary" href="board.html">커뮤니티</a>
+                <a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="new-plan.html">계획 만들기</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-slate-200/50 text-slate-600 dark:bg-card-dark dark:text-slate-300 hover:bg-primary/20 dark:hover:bg-primary/20">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <a href="mypage.html" id="mypageIcon" class="hidden size-10 rounded-full bg-cover bg-center bg-no-repeat bg-slate-300 dark:bg-card-dark dark:text-slate-300 hover:opacity-80 transition-opacity cursor-pointer items-center justify-center" style="display: none;">
+                    <span class="material-symbols-outlined">person</span>
+                </a>
+            </div>
+        </header>
+        <main class="flex-grow">
+            <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+                    <aside class="lg:col-span-1">
+                        <div class="sticky top-24 rounded-xl border border-gray-200/10 dark:border-border-dark bg-background-light dark:bg-card-dark p-4">
+                            <div class="flex flex-col gap-6">
+                                <div>
+                                    <label class="flex h-12 w-full flex-col">
+                                        <div class="flex h-full w-full flex-1 items-stretch rounded-lg">
+                                            <div class="flex items-center justify-center rounded-l-lg border-r-0 border-slate-200/10 bg-white/5 pl-4 text-slate-400 dark:border-border-dark dark:bg-background-dark">
+                                                <span class="material-symbols-outlined">search</span>
+                                            </div>
+                                            <input id="searchInput" class="form-input h-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg border-none border-l-0 bg-white/5 px-4 pl-2 text-base font-normal leading-normal text-slate-800 placeholder:text-slate-400 focus:outline-0 focus:ring-0 dark:bg-background-dark dark:text-white" placeholder="지역, 여행 타입으로 검색..." value=""/>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-2" for="sort-by">정렬 기준</label>
+                                    <select id="sortBy" class="w-full rounded-lg border-slate-200/10 bg-white/5 dark:border-border-dark dark:bg-background-dark text-slate-800 dark:text-white focus:border-primary focus:ring-primary">
+                                        <option value="popular">인기순</option>
+                                        <option value="latest">최신순</option>
+                                        <option value="views">조회순</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <details class="flex flex-col border-t border-t-slate-200/10 py-2 group dark:border-t-border-dark" open="">
+                                        <summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+                                            <p class="text-sm font-medium text-slate-800 dark:text-white">지역</p>
+                                            <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>
+                                        </summary>
+                                        <div class="flex flex-col gap-2 pt-2 text-sm text-slate-500 dark:text-slate-400">
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="1"/> 서울/경기</label>
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="32"/> 강원</label>
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="33,34"/> 충청</label>
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="37,38"/> 전라</label>
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="35,36"/> 경상</label>
+                                            <label class="flex items-center gap-2"><input class="region-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="39"/> 제주</label>
+                                        </div>
+                                    </details>
+                                    <details class="flex flex-col border-t border-t-slate-200/10 py-2 group dark:border-t-border-dark" open="">
+                                        <summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+                                            <p class="text-sm font-medium text-slate-800 dark:text-white">여행 타입</p>
+                                            <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>
+                                        </summary>
+                                        <div class="flex flex-col gap-2 pt-2 text-sm text-slate-500 dark:text-slate-400">
+                                            <label class="flex items-center gap-2"><input class="trip-type-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="가족여행"/> 가족여행</label>
+                                            <label class="flex items-center gap-2"><input class="trip-type-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="커플여행"/> 커플여행</label>
+                                            <label class="flex items-center gap-2"><input class="trip-type-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="혼자여행"/> 혼자여행</label>
+                                            <label class="flex items-center gap-2"><input class="trip-type-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="우정여행"/> 우정여행</label>
+                                            <label class="flex items-center gap-2"><input class="trip-type-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="반려동물 동반"/> 반려동물 동반</label>
+                                        </div>
+                                    </details>
+                                    <details class="flex flex-col border-t border-b border-t-slate-200/10 border-b-slate-200/10 py-2 group dark:border-t-border-dark dark:border-b-border-dark">
+                                        <summary class="flex cursor-pointer items-center justify-between gap-6 py-2">
+                                            <p class="text-sm font-medium text-slate-800 dark:text-white">계절</p>
+                                            <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>
+                                        </summary>
+                                        <div class="flex flex-col gap-2 pt-2 text-sm text-slate-500 dark:text-slate-400">
+                                            <label class="flex items-center gap-2"><input class="season-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="봄"/> 봄</label>
+                                            <label class="flex items-center gap-2"><input class="season-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="여름"/> 여름</label>
+                                            <label class="flex items-center gap-2"><input class="season-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="가을"/> 가을</label>
+                                            <label class="flex items-center gap-2"><input class="season-filter form-checkbox rounded text-primary focus:ring-primary/50" type="checkbox" value="겨울"/> 겨울</label>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                    <div class="lg:col-span-3">
+                        <div class="mb-8">
+                            <div class="flex gap-4 border-b border-gray-200/10 dark:border-border-dark mb-6">
+                                <button id="tabTravelPlan" class="tab-button px-4 py-2 text-base font-semibold text-slate-600 dark:text-slate-400 border-b-2 border-transparent hover:text-primary dark:hover:text-primary transition-colors active">
+                                    국내 여행 공유
+                                </button>
+                                <button id="tabTravelRecord" class="tab-button px-4 py-2 text-base font-semibold text-slate-600 dark:text-slate-400 border-b-2 border-transparent hover:text-primary dark:hover:text-primary transition-colors">
+                                    여행 기록
+                                </button>
+                            </div>
+                            <div id="tabContent">
+                                <h1 id="tabTitle" class="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">국내 여행 계획 공유</h1>
+                                <p id="tabDescription" class="mt-2 text-base font-normal text-slate-500 dark:text-slate-400">다른 사용자들의 여행 계획을 둘러보고 새로운 영감을 얻어보세요.</p>
+                            </div>
+                        </div>
+                        <div id="postsContainer" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                            <!-- 동적으로 로드됨 -->
+                        </div>
+                        <div id="paginationContainer" class="mt-12 flex justify-center">
+                            <!-- 페이지네이션 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="fixed bottom-8 right-8">
+            <button id="shareBtn" class="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-white font-bold shadow-lg transition-transform hover:scale-105">
+                <span class="material-symbols-outlined">share</span>
+                <span id="shareBtnText">내 여행 계획 공유하기</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 여행 기록 선택 모달 -->
+    <div id="recordSelectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-card-dark rounded-xl border border-border-dark p-6 sm:p-8 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">여행 기록 선택</h3>
+                <button onclick="closeRecordSelectModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <p class="text-slate-400 mb-4">게시판에 공유할 여행 기록을 선택해주세요.</p>
+            <div id="recordsList" class="space-y-3">
+                <!-- 동적으로 로드됨 -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/board.js"></script>
+</body>
+</html>
+
+

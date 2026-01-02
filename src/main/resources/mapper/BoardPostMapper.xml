@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.BoardPostMapper">
+    
+    <resultMap id="BoardPostResultMap" type="com.tripboard.entity.BoardPost">
+        <id property="postId" column="post_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="hotplaceId" column="hotplace_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="regionCode" column="region_code"/>
+        <result property="tripType" column="trip_type"/>
+        <result property="season" column="season"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="isPublic" column="is_public"/>
+        <result property="category" column="category"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="authorNickname" column="author_nickname"/>
+        <result property="authorName" column="author_name"/>
+        <result property="authorProfileImage" column="author_profile_image"/>
+    </resultMap>
+    
+    <select id="findById" resultMap="BoardPostResultMap">
+        SELECT bp.post_id, bp.user_id, bp.plan_id, bp.hotplace_id, bp.title, bp.content, bp.region_code, bp.trip_type, bp.season,
+               bp.view_count, bp.like_count,
+               (SELECT COUNT(*) FROM board_comments WHERE post_id = bp.post_id) as comment_count,
+               bp.is_public, bp.category, bp.created_at, bp.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM board_posts bp
+        LEFT JOIN users u ON bp.user_id = u.user_id
+        WHERE bp.post_id = #{postId}
+    </select>
+    
+    <select id="findPublicPosts" resultMap="BoardPostResultMap">
+        SELECT bp.post_id, bp.user_id, bp.plan_id, bp.hotplace_id, bp.title, bp.content, bp.region_code, bp.trip_type, bp.season,
+               bp.view_count, bp.like_count,
+               (SELECT COUNT(*) FROM board_comments WHERE post_id = bp.post_id) as comment_count,
+               bp.is_public, bp.category, bp.created_at, bp.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM board_posts bp
+        LEFT JOIN users u ON bp.user_id = u.user_id
+        WHERE bp.is_public = true
+        <if test="category != null and category != ''">
+            AND bp.category = #{category}
+        </if>
+        <if test="regionCodeList != null and regionCodeList.size() > 0">
+            AND (
+            <foreach collection="regionCodeList" item="code" separator=" OR ">
+                (bp.region_code = #{code}
+                OR (bp.region_code IS NOT NULL AND FIND_IN_SET(#{code}, bp.region_code) > 0))
+            </foreach>
+            )
+        </if>
+        <if test="tripTypeList != null and tripTypeList.size() > 0">
+            AND (
+            <foreach collection="tripTypeList" item="type" separator=" OR ">
+                bp.trip_type = #{type}
+            </foreach>
+            )
+        </if>
+        <if test="seasonList != null and seasonList.size() > 0">
+            AND (
+            <foreach collection="seasonList" item="s" separator=" OR ">
+                bp.season = #{s}
+            </foreach>
+            )
+        </if>
+        ORDER BY bp.created_at DESC
+    </select>
+    
+    <select id="findByUserId" resultMap="BoardPostResultMap">
+        SELECT bp.post_id, bp.user_id, bp.plan_id, bp.hotplace_id, bp.title, bp.content, bp.region_code, bp.trip_type, bp.season,
+               bp.view_count, bp.like_count,
+               (SELECT COUNT(*) FROM board_comments WHERE post_id = bp.post_id) as comment_count,
+               bp.is_public, bp.category, bp.created_at, bp.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM board_posts bp
+        LEFT JOIN users u ON bp.user_id = u.user_id
+        WHERE bp.user_id = #{userId}
+        ORDER BY bp.created_at DESC
+    </select>
+    
+    <select id="findLikedPosts" resultMap="BoardPostResultMap">
+        SELECT bp.post_id, bp.user_id, bp.plan_id, bp.hotplace_id, bp.title, bp.content, bp.region_code, bp.trip_type, bp.season,
+               bp.view_count, bp.like_count,
+               (SELECT COUNT(*) FROM board_comments WHERE post_id = bp.post_id) as comment_count,
+               bp.is_public, bp.category, bp.created_at, bp.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM board_posts bp
+        LEFT JOIN users u ON bp.user_id = u.user_id
+        INNER JOIN post_likes pl ON bp.post_id = pl.post_id
+        WHERE pl.user_id = #{userId}
+        ORDER BY pl.created_at DESC
+    </select>
+    
+    <select id="findCommentedPosts" resultMap="BoardPostResultMap">
+        SELECT DISTINCT bp.post_id, bp.user_id, bp.plan_id, bp.hotplace_id, bp.title, bp.content, bp.region_code, bp.trip_type, bp.season,
+               bp.view_count, bp.like_count,
+               (SELECT COUNT(*) FROM board_comments WHERE post_id = bp.post_id) as comment_count,
+               bp.is_public, bp.category, bp.created_at, bp.updated_at,
+               COALESCE(u.nickname, u.name) as author_nickname,
+               u.name as author_name,
+               u.profile_image as author_profile_image
+        FROM board_posts bp
+        LEFT JOIN users u ON bp.user_id = u.user_id
+        INNER JOIN board_comments bc ON bp.post_id = bc.post_id
+        WHERE bc.user_id = #{userId}
+        ORDER BY bp.created_at DESC
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO board_posts (user_id, plan_id, hotplace_id, title, content, region_code, trip_type, season,
+                                view_count, like_count, is_public, category, created_at, updated_at)
+        VALUES (#{userId}, #{planId}, #{hotplaceId}, #{title}, #{content}, #{regionCode}, #{tripType}, #{season},
+                #{viewCount}, #{likeCount}, #{isPublic}, #{category}, #{createdAt}, #{updatedAt})
+    </insert>
+    
+    <update id="update">
+        UPDATE board_posts
+        SET title = #{title},
+            content = #{content},
+            view_count = #{viewCount},
+            like_count = #{likeCount},
+            updated_at = #{updatedAt}
+        WHERE post_id = #{postId}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM board_posts WHERE post_id = #{postId}
+    </delete>
+    
+</mapper>

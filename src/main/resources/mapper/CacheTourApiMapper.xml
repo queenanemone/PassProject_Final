@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.CacheTourApiMapper">
+    
+    <resultMap id="TourApiCacheResultMap" type="com.tripboard.entity.CacheTourApi">
+        <id property="cacheId" column="cache_id"/>
+        <result property="contentId" column="content_id"/>
+        <result property="contentTypeId" column="content_type_id"/>
+        <result property="title" column="title"/>
+        <result property="areaCode" column="area_code"/>
+        <result property="sigunguCode" column="sigungu_code"/>
+        <result property="cat1" column="cat1"/>
+        <result property="cat2" column="cat2"/>
+        <result property="cat3" column="cat3"/>
+        <result property="addr1" column="addr1"/>
+        <result property="addr2" column="addr2"/>
+        <result property="mapX" column="map_x"/>
+        <result property="mapY" column="map_y"/>
+        <result property="firstImage" column="first_image"/>
+        <result property="firstImage2" column="first_image2"/>
+        <result property="overview" column="overview"/>
+        <result property="isPetFriendly" column="is_pet_friendly"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="findByContentId" resultMap="TourApiCacheResultMap">
+        SELECT * FROM cache_tour_api WHERE content_id = #{contentId}
+    </select>
+    
+    <select id="findByAreaCode" resultMap="TourApiCacheResultMap">
+        SELECT * FROM cache_tour_api
+        WHERE area_code = #{areaCode}
+        <if test="contentTypeId != null">
+            AND content_type_id = #{contentTypeId}
+        </if>
+        <if test="hasPet != null and hasPet == true">
+            AND is_pet_friendly = true
+        </if>
+        ORDER BY created_at DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cacheId">
+        INSERT INTO cache_tour_api (content_id, content_type_id, title, area_code, sigungu_code,
+                                   cat1, cat2, cat3, addr1, addr2, map_x, map_y, first_image,
+                                   first_image2, overview, is_pet_friendly, created_at, updated_at)
+        VALUES (#{contentId}, #{contentTypeId}, #{title}, #{areaCode}, #{sigunguCode},
+                #{cat1}, #{cat2}, #{cat3}, #{addr1}, #{addr2}, #{mapX}, #{mapY}, #{firstImage},
+                #{firstImage2}, #{overview}, #{isPetFriendly}, #{createdAt}, #{updatedAt})
+    </insert>
+    
+    <select id="searchByKeyword" resultMap="TourApiCacheResultMap">
+        SELECT * FROM cache_tour_api
+        WHERE (title LIKE CONCAT('%', #{keyword}, '%')
+           OR addr1 LIKE CONCAT('%', #{keyword}, '%')
+           OR addr2 LIKE CONCAT('%', #{keyword}, '%')
+           OR overview LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="contentTypeId != null">
+            AND content_type_id = #{contentTypeId}
+        </if>
+        ORDER BY 
+            CASE 
+                WHEN title LIKE CONCAT('%', #{keyword}, '%') THEN 1
+                WHEN addr1 LIKE CONCAT('%', #{keyword}, '%') THEN 2
+                ELSE 3
+            END,
+            created_at DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+    
+    <update id="update">
+        UPDATE cache_tour_api
+        SET title = #{title},
+            area_code = #{areaCode},
+            sigungu_code = #{sigunguCode},
+            addr1 = #{addr1},
+            addr2 = #{addr2},
+            map_x = #{mapX},
+            map_y = #{mapY},
+            first_image = #{firstImage},
+            first_image2 = #{firstImage2},
+            overview = #{overview},
+            is_pet_friendly = #{isPetFriendly},
+            updated_at = #{updatedAt}
+        WHERE content_id = #{contentId}
+    </update>
+    
+</mapper>
+

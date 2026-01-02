@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>마이페이지 - Trip-Board</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#60A5FA",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#171F2D",
+                        "card-dark": "#202938",
+                        "border-dark": "#343F51",
+                        "text-dark": "#E5E7EB",
+                        "text-secondary-dark": "#9CA3AF",
+                        "secondary-button-dark": "#374151",
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+        header {
+            background-color: rgba(246, 247, 248, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+        html.dark header {
+            background-color: rgba(23, 31, 45, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+        @keyframes slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fade-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        .animate-slide-in {
+            animation: slide-in 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-dark font-sans">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-gray-200/10 dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 px-4 sm:px-10 py-3 backdrop-blur-sm">
+            <button onclick="goBack()" class="flex items-center gap-2 text-text-secondary-dark hover:text-text-dark transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="hidden sm:inline font-medium">뒤로</span>
+            </button>
+            <a href="index.html" class="flex items-center gap-4 text-text-dark hover:opacity-80 transition-opacity">
+                <span class="material-symbols-outlined text-primary text-3xl">map</span>
+                <h2 class="text-lg font-bold">Trip-Board</h2>
+            </a>
+            <div></div>
+        </header>
+        <main class="flex-1 p-4 md:p-8">
+            <div class="mx-auto max-w-4xl">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-text-dark mb-8">마이페이지</h1>
+                
+                <!-- 사용자 정보 섹션 -->
+                <div class="bg-card-dark rounded-xl border border-border-dark p-6 sm:p-8 mb-6">
+                    <h2 class="text-2xl font-bold text-text-dark mb-6">내 정보</h2>
+                    <div id="userInfo" class="space-y-4">
+                        <!-- 동적으로 로드됨 -->
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-border-dark">
+                        <button onclick="handleLogout()" class="flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>로그아웃</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 여행 성향 설정 섹션 -->
+                <div class="bg-card-dark rounded-xl border border-border-dark p-6 sm:p-8">
+                    <h2 class="text-2xl font-bold text-text-dark mb-6">여행 성향 설정</h2>
+                    <p class="text-text-secondary-dark mb-6">AI 여행지 추천을 위해 여행 성향을 설정해주세요.</p>
+                    
+                    <form id="preferenceForm" class="space-y-6">
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">선호하는 여행 타입</label>
+                            <select id="preferredTripType" name="preferredTripType" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="가족여행">가족여행</option>
+                                <option value="커플여행">커플여행</option>
+                                <option value="혼자여행">혼자여행</option>
+                                <option value="우정여행">우정여행</option>
+                                <option value="반려동물 동반">반려동물 동반</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">선호하는 활동 (복수 선택 가능)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="휴양" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">휴양</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="액티비티" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">액티비티</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="문화" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">문화</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="먹방" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">먹방</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="쇼핑" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">쇼핑</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="사진" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">사진</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="자연" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">자연</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="preferredActivities" value="힐링" class="form-checkbox rounded text-primary focus:ring-primary/50">
+                                    <span class="text-text-dark text-sm">힐링</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">예산 선호도</label>
+                            <select id="budgetPreference" name="budgetPreference" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="절약형">절약형</option>
+                                <option value="보통">보통</option>
+                                <option value="여유형">여유형</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">숙소 선호도</label>
+                            <select id="accommodationPreference" name="accommodationPreference" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="호텔">호텔</option>
+                                <option value="펜션">펜션</option>
+                                <option value="게스트하우스">게스트하우스</option>
+                                <option value="캠핑">캠핑</option>
+                                <option value="리조트">리조트</option>
+                                <option value="상관없음">상관없음</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">계절 선호도</label>
+                            <select id="seasonPreference" name="seasonPreference" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="봄">봄</option>
+                                <option value="여름">여름</option>
+                                <option value="가을">가을</option>
+                                <option value="겨울">겨울</option>
+                                <option value="상관없음">상관없음</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">교통 수단 선호도</label>
+                            <select id="transportationPreference" name="transportationPreference" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="자가용">자가용</option>
+                                <option value="대중교통">대중교통</option>
+                                <option value="렌트카">렌트카</option>
+                                <option value="상관없음">상관없음</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">음식 선호도</label>
+                            <select id="foodPreference" name="foodPreference" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="한식">한식</option>
+                                <option value="양식">양식</option>
+                                <option value="중식">중식</option>
+                                <option value="일식">일식</option>
+                                <option value="다양하게">다양하게</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">여행 스타일</label>
+                            <select id="travelStyle" name="travelStyle" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark h-12 px-4">
+                                <option value="">선택 안함</option>
+                                <option value="계획형">계획형</option>
+                                <option value="즉흥형">즉흥형</option>
+                                <option value="둘 다">둘 다</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-text-dark text-base font-medium mb-2 block">추가 정보</label>
+                            <textarea id="additionalInfo" name="additionalInfo" rows="4" class="w-full rounded-lg text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-dark bg-background-dark p-4" placeholder="추가로 알려주고 싶은 여행 성향이 있다면 적어주세요."></textarea>
+                        </div>
+                        
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="flex-1 flex items-center justify-center gap-2 rounded-lg h-12 px-6 bg-primary text-white font-bold hover:bg-blue-400 transition-colors">
+                                <span class="material-symbols-outlined">save</span>
+                                <span>저장하기</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/mypage.js"></script>
+</body>
+</html>
+

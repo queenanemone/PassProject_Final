@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.AiRecommendationMapper">
+    
+    <resultMap id="AiRecommendationResultMap" type="com.tripboard.entity.AiRecommendation">
+        <id property="recommendationId" column="recommendation_id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="recommendationType" column="recommendation_type"/>
+        <result property="contentId" column="content_id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="reason" column="reason"/>
+        <result property="address" column="address"/>
+        <result property="mapX" column="map_x"/>
+        <result property="mapY" column="map_y"/>
+        <result property="imageKeyword" column="image_keyword"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <select id="findByPlanId" resultMap="AiRecommendationResultMap">
+        SELECT 
+            recommendation_id, plan_id, user_id, recommendation_type, content_id, title, description, reason,
+            address, map_x, map_y, image_keyword, 
+            created_at 
+        FROM ai_recommendations
+        WHERE plan_id = #{planId}
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="recommendationId">
+        INSERT INTO ai_recommendations 
+        (plan_id, user_id, recommendation_type, content_id, title, description, reason, address, map_x, map_y, image_keyword, created_at)
+        VALUES 
+        (#{planId}, #{userId}, #{recommendationType}, #{contentId}, #{title}, #{description}, #{reason}, #{address}, #{mapX}, #{mapY}, #{imageKeyword}, #{createdAt})
+    </insert>
+    
+    <delete id="delete">
+        DELETE FROM ai_recommendations WHERE recommendation_id = #{recommendationId}
+    </delete>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM ai_recommendations WHERE plan_id = #{planId}
+    </delete>
+    
+</mapper>
+

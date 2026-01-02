@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.UserTravelPreferenceMapper">
+    
+    <resultMap id="UserTravelPreferenceResultMap" type="com.tripboard.entity.UserTravelPreference">
+        <id property="preferenceId" column="preference_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="preferredTripType" column="preferred_trip_type"/>
+        <result property="preferredActivities" column="preferred_activities"/>
+        <result property="budgetPreference" column="budget_preference"/>
+        <result property="accommodationPreference" column="accommodation_preference"/>
+        <result property="seasonPreference" column="season_preference"/>
+        <result property="transportationPreference" column="transportation_preference"/>
+        <result property="foodPreference" column="food_preference"/>
+        <result property="travelStyle" column="travel_style"/>
+        <result property="additionalInfo" column="additional_info"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="findByUserId" resultMap="UserTravelPreferenceResultMap">
+        SELECT * FROM user_travel_preferences WHERE user_id = #{userId}
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="preferenceId">
+        INSERT INTO user_travel_preferences (
+            user_id, preferred_trip_type, preferred_activities, budget_preference,
+            accommodation_preference, season_preference, transportation_preference,
+            food_preference, travel_style, additional_info, created_at, updated_at
+        )
+        VALUES (
+            #{userId}, #{preferredTripType}, #{preferredActivities}, #{budgetPreference},
+            #{accommodationPreference}, #{seasonPreference}, #{transportationPreference},
+            #{foodPreference}, #{travelStyle}, #{additionalInfo}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE user_travel_preferences
+        SET preferred_trip_type = #{preferredTripType},
+            preferred_activities = #{preferredActivities},
+            budget_preference = #{budgetPreference},
+            accommodation_preference = #{accommodationPreference},
+            season_preference = #{seasonPreference},
+            transportation_preference = #{transportationPreference},
+            food_preference = #{foodPreference},
+            travel_style = #{travelStyle},
+            additional_info = #{additionalInfo},
+            updated_at = #{updatedAt}
+        WHERE user_id = #{userId}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM user_travel_preferences WHERE user_id = #{userId}
+    </delete>
+    
+</mapper>
+

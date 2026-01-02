@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tripboard.mapper.PlanSpotMapper">
+    
+    <resultMap id="PlanSpotResultMap" type="com.tripboard.entity.PlanSpot">
+        <id property="planId" column="plan_id"/>
+        <id property="spotOrder" column="spot_order"/> 
+        
+        <result property="contentId" column="content_id"/>
+        <result property="visitDate" column="visit_date"/>
+        <result property="visitTime" column="visit_time"/>
+        <result property="duration" column="duration"/>
+        <result property="isSelected" column="is_selected"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <select id="findByPlanId" resultMap="PlanSpotResultMap">
+        SELECT 
+            plan_id, spot_order, content_id, visit_date, visit_time, duration, is_selected, created_at 
+        FROM plan_spots 
+        WHERE plan_id = #{planId} 
+        ORDER BY visit_date, visit_time, spot_order
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO plan_spots 
+            (plan_id, spot_order, content_id, visit_date, visit_time, duration, is_selected, created_at)
+        VALUES 
+            (#{planId}, #{spotOrder}, #{contentId}, #{visitDate}, #{visitTime}, #{duration}, #{isSelected}, #{createdAt})
+    </insert>
+    
+    <update id="updateOrderAndDate">
+        UPDATE plan_spots
+        SET 
+            visit_date = #{newVisitDate},
+            spot_order = #{newSpotOrder}
+        WHERE 
+            plan_id = #{planId}
+            AND spot_order = #{oldSpotOrder}
+    </update>
+
+    <delete id="deleteSpot">
+        DELETE FROM plan_spots 
+        WHERE plan_id = #{planId} AND spot_order = #{spotOrder}
+    </delete>
+
+    <delete id="deleteByPlanId">
+        DELETE FROM plan_spots WHERE plan_id = #{planId}
+    </delete>
+    
+</mapper>
